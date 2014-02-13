@@ -67,8 +67,4 @@
  *
  * (asm goto is automatically volatile - the naming reflects this.)
  */
-#if __GNUC_MINOR__ <= 8 && __GNUC_PATCHLEVEL__ <= 1
-# define asm_volatile_goto(x...)	do { asm goto(x); asm (""); } while (0)
-#else
-# define asm_volatile_goto(x...)	do { asm goto(x); } while (0)
-#endif
+#define asm_volatile_goto(x...)	do { asm goto(x); asm (""); } while (0)
