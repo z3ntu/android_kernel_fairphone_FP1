@@ -378,13 +378,6 @@ KBUILD_AFLAGS_MODULE  := -DMODULE
 KBUILD_CFLAGS_MODULE  := -DMODULE
 KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
 
--include $(srctree)/$(MTK_PROJECT)_mtk_cust.mak
-MTK_INC += -I$(MTK_ROOT_CUSTOM)/$(TARGET_PRODUCT)/common
-LINUXINCLUDE	+= $(MTK_INC)
-KBUILD_CFLAGS	+= $(MTK_CFLAGS) $(MTK_CDEFS)
-KBUILD_CPPFLAGS	+= $(MTK_CPPFLAGS) $(MTK_CPPDEFS)
-KBUILD_AFLAGS   += $(MTK_AFLAGS) $(MTK_ADEFS)
-
 # Read KERNELRELEASE from include/config/kernel.release (if it exists)
 KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
 KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
