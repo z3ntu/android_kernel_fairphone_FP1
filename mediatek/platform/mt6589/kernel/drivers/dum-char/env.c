@@ -3,9 +3,17 @@
 #include <linux/statfs.h>
 #include <linux/fs.h>
 #include <linux/module.h>
+
+#include "partition_define.h"
+
 #define MODULE_NAME "LK_ENV"
 
 #define DATA_FREE_SIZE_TH_NAME "data_free_size_th"
+
+#ifdef MTK_EMMC_SUPPORT
+extern int eMMC_rw_x(loff_t addr,u32  *buffer, int host_num, int iswrite,u32 totalsize, int transtype, Region part);
+#endif
+
 env_t g_env;
 static int env_valid = 0;
 static char *env_buffer = NULL;
