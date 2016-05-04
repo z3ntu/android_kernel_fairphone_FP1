@@ -116,8 +116,6 @@ $(foreach i,\
 )
 LINUXINCLUDE += $(strip $(addprefix -I$(MTK_ROOT_CUSTOM_OUT)/kernel/,$(_module_inc_kernel)))
 LINUXINCLUDE += $(strip $(addprefix -I$(MTK_ROOT_CUSTOM_OUT)/hal/,$(_module_inc_hal)))
-# add include path for ptgen output
-LINUXINCLUDE += -I$(MTK_ROOT_CUSTOM_OUT)/common
 #$(foreach p,$(strip $(addprefix -I$(MTK_ROOT_CUSTOM_OUT)/kernel/,$(_module_inc_kernel))),$(info --> $(p)))
 #$(foreach p,$(strip $(addprefix -I$(MTK_ROOT_CUSTOM_OUT)/hal/,$(_module_inc_hal))),$(info --> $(p)))
 

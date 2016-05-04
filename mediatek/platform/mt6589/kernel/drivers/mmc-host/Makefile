@@ -1,3 +1,5 @@
+ccflags-y += -I$(srctree)/../mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/common/
+
 obj-$(CONFIG_MTK_MMC) += dbg.o
 obj-$(CONFIG_MTK_MMC) += sd.o mt_sd_misc.o
 
