@@ -1,0 +1,6 @@
+menu "MediaTek Custom Configurations"
+
+config ARCH_MTK_PROJECT
+	string "MediaTek project name"
+
+endmenu

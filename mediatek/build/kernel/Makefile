@@ -30,7 +30,6 @@ drivers-y       += $(MTK_PATH_CUSTOM)/
 endif
 
 LINUXINCLUDE    += -I$(MTK_PATH_PLATFORM)/core/include/
-LINUXINCLUDE    += -I$(MTK_ROOT_CUSTOM)/$(MTK_PROJECT)/common
 LINUXINCLUDE    += -I$(MTK_PATH_SOURCE)/include/
 KBUILD_CFLAGS   += $(call mtk.custom.generate-macros)
 
@@ -82,8 +81,6 @@ $(foreach i,\
 )
 LINUXINCLUDE += $(strip $(addprefix -I$(MTK_ROOT_CUSTOM_OUT)/kernel/,$(_module_inc_kernel)))
 LINUXINCLUDE += $(strip $(addprefix -I$(MTK_ROOT_CUSTOM_OUT)/hal/,$(_module_inc_hal)))
-# add include path for ptgen output
-LINUXINCLUDE += -I$(MTK_ROOT_CUSTOM_OUT)/common
 #$(foreach p,$(strip $(addprefix -I$(MTK_ROOT_CUSTOM_OUT)/kernel/,$(_module_inc_kernel))),$(info --> $(p)))
 #$(foreach p,$(strip $(addprefix -I$(MTK_ROOT_CUSTOM_OUT)/hal/,$(_module_inc_hal))),$(info --> $(p)))
 
