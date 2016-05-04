@@ -1,6 +1,5 @@
 #ifndef __ENV_H__
 #define __ENV_H__
-#include "partition_define.h"
 #include <linux/errno.h>	/* error codes */
 #include <linux/types.h>	/* size_t */
 #include <linux/proc_fs.h>  /*proc*/
@@ -47,9 +46,6 @@ struct env_ioctl
 	int value_len;	
 };
 extern void env_init(loff_t env_part_addr);
-#ifdef MTK_EMMC_SUPPORT
-extern int eMMC_rw_x(loff_t addr,u32  *buffer, int host_num, int iswrite,u32 totalsize, int transtype, Region part);
-#endif
 extern int set_env(char *name,char *value);
 extern char *get_env(char *name);
 extern long long data_free_size_th;
