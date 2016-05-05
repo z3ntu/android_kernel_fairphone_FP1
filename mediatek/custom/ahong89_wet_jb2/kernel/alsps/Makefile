@@ -1,0 +1,1 @@
+obj-$(CONFIG_MTK_STK3171)	+= stk3171/

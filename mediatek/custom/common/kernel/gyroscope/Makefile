@@ -1,0 +1,1 @@
+obj-$(CONFIG_MTK_MPU3050C)	+= mpu3050c/

@@ -1,4 +1,4 @@
-ccflags-y += -I$(srctree)/../mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/common/
+ccflags-y += -I$(srctree)/mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/common/
 
 # Display parameters shown under Settings -> About Phone
 

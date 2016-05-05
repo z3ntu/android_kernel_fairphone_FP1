@@ -1,0 +1,1 @@
+obj-$(CONFIG_MTK_MMC3416)	+= mmc3416/

@@ -1,3 +1,5 @@
+ccflags-y += -I$(srctree)/mediatek/custom/common/kernel/leds/inc/
+
 #
 # for CA7 cpu stress test
 #
