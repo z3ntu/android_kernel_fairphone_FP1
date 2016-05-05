@@ -54,6 +54,10 @@ g_ncm-y				:= ncm.o
 g_acm_ms-y			:= acm_ms.o
 g_android-y			:= android.o
 
+# Needed for android.c, as it includes <mach/mtk_musb.h> which, in turn,
+# includes <mach/mt_gpio.h> which, in turn, includes <cust_gpio_usage.h>.
+ccflags-y += -I$(srctree)/mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/kernel/dct/dct/
+
 obj-$(CONFIG_USB_ZERO)		+= g_zero.o
 obj-$(CONFIG_USB_AUDIO)		+= g_audio.o
 obj-$(CONFIG_USB_ETH)		+= g_ether.o

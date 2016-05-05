@@ -1,3 +1,8 @@
+ccflags-y += -I$(srctree)/mediatek/custom/common/kernel/accelerometer/inc/
+ccflags-y += -I$(srctree)/mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/kernel/battery/battery/
+ccflags-y += -I$(srctree)/mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/kernel/dct/dct/
+ccflags-y += -I$(srctree)/mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/kernel/kpd/kpd/
+
 obj-$(CONFIG_MTK_PMIC)          += pmic_mt6320.o upmu_common.o
 
 ifeq ($(MTK_BQ24196_SUPPORT),yes) 

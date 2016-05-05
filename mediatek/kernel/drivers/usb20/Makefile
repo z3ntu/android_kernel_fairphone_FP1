@@ -1,3 +1,5 @@
+ccflags-y += -I$(srctree)/mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/kernel/dct/dct/
+
 #
 # for USB OTG silicon based on Mentor Graphics INVENTRA designs
 #

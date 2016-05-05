@@ -3,4 +3,107 @@ menu "MediaTek Custom Configurations"
 config ARCH_MTK_PROJECT
 	string "MediaTek project name"
 
+# General "CUSTOM_KERNEL_*" options are copied from the
+# "drivers/misc/mediatek/Kconfig" of the official MediaTek kernel for Android:
+# https://android.googlesource.com/kernel/mediatek/+/android-4.4.4_r3/drivers/misc/mediatek/Kconfig
+
+config CUSTOM_KERNEL_ACCELEROMETER
+	bool "CUSTOM_KERNEL_ACCELEROMETER"
+	help
+	   accelerometer sensor to detect accelerometer from x y z axis.
+
+config CUSTOM_KERNEL_ALSPS
+	bool "CUSTOM_KERNEL_ALSPS"
+	help
+	   ALSPS sensor driverto detect ambint light and the object is close
+	   or far awary from device
+
+config CUSTOM_KERNEL_FLASHLIGHT
+	string "CUSTOM_KERNEL_FLASHLIGHT"
+	help
+	   Kernel space cameara flashlight driver. You can use this driver
+	   choose cameara flashlight type.
+
+config CUSTOM_KERNEL_GYROSCOPE
+	bool "CUSTOM_KERNEL_GYROSCOPE"
+	help
+	   gyro driver
+
+config CUSTOM_KERNEL_IMGSENSOR
+	string "CUSTOM_KERNEL_IMGSENSOR"
+	help
+	   Kernel space image sensor driver. Define  project used all image
+	   sensors .The value is combination of CUSTOM_KERNEL_MAIN_IMGSENSOR,
+	   CUSTOM_KERNEL_MAIN_BACKUP_IMGSENSOR, CUSTOM_KERNEL_SUB_IMGSENSOR,
+	   and CUSTOM_KERNEL_SUB_BACKUP_IMGSENSOR
+
+config CUSTOM_KERNEL_LCM
+	string "CUSTOM_KERNEL_LCM"
+	help
+	   To choose kernel LCM driver name
+
+config CUSTOM_KERNEL_MAGNETOMETER
+	bool "CUSTOM_KERNEL_MAGNETOMETER"
+	help
+	   compass driver to detect compass raw data and report orientatino
+	   data
+
+config CUSTOM_KERNEL_SSW
+	bool "CUSTOM_KERNEL_SSW"
+
+config CUSTOM_KERNEL_TOUCHPANEL
+	string "CUSTOM_KERNEL_TOUCHPANEL"
+	help
+	   touch driver need to report correct touch axes
+
+
+
+# Special CUSTOM_KERNEL_ options
+
+config CUSTOM_KERNEL_CAM_CAL
+	string "CUSTOM_KERNEL_CAM_CAL"
+	default "dummy_eeprom"
+
+config CUSTOM_KERNEL_EEPROM
+	string "CUSTOM_KERNEL_EEPROM"
+	default "dummy_eeprom"
+
+config CUSTOM_KERNEL_LENS
+	string "CUSTOM_KERNEL_LENS"
+	default "dummy_lens"
+
+
+
+# Accelerometer sensor
+config MTK_BMA250
+        bool "BMA250 accelerometer for MediaTek package"
+        default n
+
+# ALSPS sensor
+config MTK_STK3171
+        bool "STK3171 ALSPS for MediaTek package"
+        default n
+
+# Gyroscope sensor
+config MTK_MPU3050C
+        bool "MPU3050C gyroscope for MediaTek package"
+        default n
+
+# Magnetometer sensor
+config MTK_MMC3416
+        bool "MMC3416 magnetometer for MediaTek package"
+        default n
+
+
+
+# MTK sound driver
+config MTK_AMP_YAD
+        bool "AMP_YAD MTK sound driver for MediaTek package"
+        default n
+
+# SSW driver
+config MTK_SSW_GENERIC
+        bool "SSW_GENERIC SSW driver for MediaTek package"
+        default n
+
 endmenu

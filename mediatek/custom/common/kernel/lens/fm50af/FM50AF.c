@@ -12,7 +12,7 @@
 #include <linux/fs.h>
 #include <asm/atomic.h>
 #include "FM50AF.h"
-#include "../camera/kd_camera_hw.h"
+#include "kd_camera_hw.h"
 
 #define LENS_I2C_BUSNUM 1
 static struct i2c_board_info __initdata kd_lens_dev={ I2C_BOARD_INFO("FM50AF", 0x18)};

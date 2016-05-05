@@ -1,3 +1,5 @@
+ccflags-y += -I$(srctree)/mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/kernel/core/src/
+
 # drivers/barcelona/gps/Makefile
 #
 # Makefile for the Barcelona GPS driver.

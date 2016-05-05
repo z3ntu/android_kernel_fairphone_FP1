@@ -1,3 +1,8 @@
+ccflags-y += -I$(srctree)/mediatek/custom/common/kernel/hdmi/inc/
+ccflags-y += -I$(srctree)/mediatek/custom/common/kernel/lcm/inc/
+ccflags-y += -I$(srctree)/mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/kernel/core/src/
+ccflags-y += -I$(srctree)/mediatek/custom/$(subst ",,$(CONFIG_ARCH_MTK_PROJECT))/kernel/dct/dct/
+
 # drivers/video/mtk/Makefile
 #
 # Makefile for MT6516 video driver.

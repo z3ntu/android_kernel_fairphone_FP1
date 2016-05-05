@@ -10,7 +10,7 @@
 #include <linux/dma-mapping.h>
 #include <linux/xlog.h>
 
-#include "../camera/kd_camera_hw.h"
+#include "kd_camera_hw.h"
 #include <asm/system.h>
 
 
