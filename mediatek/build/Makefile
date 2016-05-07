@@ -56,12 +56,14 @@ endef
 # 2) Path Prefix  : the prefix  (e.g., ../../) from caller makefile to codebase root.
 # 3) Platform     : platform the current project for
 # 4) Project      : project name
+# 5) Out dir      : the path to the output directory; if not set, the path prefix is used.
 # exported values:
 # MTK_ROOT_*          : to <top>/mediatek/*
+# MTK_ROOT_*_OUT      : to <out>/mediatek/*/out/<project>
 # MTK_PATH_*          : to <top>/mediatek/*/<postfix>
 # MTK_PATH_PLATFORM   : to <top>/mediatek/<platform>/<postfix>
-# MTK_PATH_CUSTOM     : to <top>/mediatek/custom/out/<project>/<postfix>
-# MTK_ROOT_GEN_CONFIG : to <top>/mediatek/config/out/<project>/autoconfig
+# MTK_PATH_CUSTOM     : to <out>/mediatek/custom/out/<project>/<postfix>
+# MTK_ROOT_GEN_CONFIG : to <out>/mediatek/config/out/<project>/autoconfig
 #   under ABS, general RD users should only use MTK_CUSTOM here (to access custom folder)
 #   other building system should directly support custom folder.
 define codebase-path
@@ -69,16 +71,18 @@ $(eval $(if $(3),$(eval _3:=$(3)),$(eval _3:=$(call lc,$(MTK_PLATFORM))))) \
 $(eval $(if $(4),$(eval _4:=$(4)),$(eval _4:=$(FULL_PROJECT)))) \
 $(eval $(if $(2),$(eval _2:=$(2)/),$(eval _2:=$(call to-root)))) \
 $(eval $(if $(1),$(eval _1:=/$(1)),$(eval _1:=/$(call from-root)))) \
+$(eval $(if $(5),$(eval _5:=$(5)/),$(eval _5:=$(_2)))) \
 $(eval TO_ROOT := $(_2)) \
 $(eval MTK_ROOT := $(_2)mediatek) \
+$(eval MTK_ROOT_OUT := $(_5)mediatek) \
 $(eval MTK_ROOT_PLATFORM := $(MTK_ROOT)/platform/$(_3)) \
 $(eval MTK_ROOT_BUILD := $(MTK_ROOT)/build) \
 $(eval MTK_ROOT_SOURCE = $(MTK_ROOT)) \
 $(eval MTK_ROOT_SOURCE_OPERATOR := $(MTK_ROOT_SOURCE)/operator) \
 $(eval MTK_ROOT_CUSTOM := $(MTK_ROOT)/custom) \
-$(eval MTK_ROOT_CUSTOM_OUT := $(MTK_ROOT_CUSTOM)/out/$(FULL_PROJECT)) \
+$(eval MTK_ROOT_CUSTOM_OUT := $(MTK_ROOT_OUT)/custom/out/$(FULL_PROJECT)) \
 $(eval MTK_ROOT_CONFIG := $(MTK_ROOT)/config) \
-$(eval MTK_ROOT_CONFIG_OUT := $(MTK_ROOT_CONFIG)/out/$(FULL_PROJECT)) \
+$(eval MTK_ROOT_CONFIG_OUT := $(MTK_ROOT_OUT)/config/out/$(FULL_PROJECT)) \
 $(eval MTK_ROOT_GEN_CONFIG := $(MTK_ROOT_CONFIG_OUT)/autoconfig) \
 $(eval MTK_PATH_PLATFORM := $(MTK_ROOT_PLATFORM)$(_1)) \
 $(eval MTK_PATH_BUILD := $(MTK_ROOT_BUILD)$(_1)) \
