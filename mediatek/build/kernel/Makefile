@@ -54,7 +54,10 @@ mtkclean:
 	find $(MTK_ROOT_GEN_CONFIG) -name kconfig -type f -print | xargs rm -f
 endif
 
-generated_files := $(call mtk.config.generate-rules)
-mediatekconfig: $(MTK_ROOT_GEN_CONFIG)/kconfig $(MTK_ROOT_GEN_CONFIG)
+$(MTK_ROOT_GEN_CONFIG):
+	@mkdir -p $@
+
+generated_files := $(call .mtk.config.generate-auto-rules,kconfig)
+mediatekconfig: $(MTK_ROOT_GEN_CONFIG)/kconfig
 	@echo "[COPY] $< --> $(KCONFIG_CONFIG)"
 	@cp $< $(KCONFIG_CONFIG)
