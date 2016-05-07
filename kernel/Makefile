@@ -525,14 +525,7 @@ ifeq ($(KBUILD_EXTMOD),)
 -include include/config/auto.conf.cmd
 
 # To avoid any implicit rule to kick in, define an empty command
-ifneq ($(SRCARCH),arm)
 $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
-else
-#TODO { 
-#modify by MTK, we have the .config rule, don't set the empty command rule for .config
-include/config/auto.conf.cmd: ;
-# }
-endif
 
 # If .config is newer than include/config/auto.conf, someone tinkered
 # with it and forgot to run make oldconfig.
