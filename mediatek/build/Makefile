@@ -2,18 +2,15 @@ ifneq (true,$(__mtk_main_makefile_include))
 __mtk_main_makefile_include := true
 
 # Makefile - global makefile for all building system to include
-ifneq (,$(PROJECT))
-TARGET_PRODUCT := $(PROJECT)
-endif
-ifeq (emulator,$(TARGET_PRODUCT))
-TARGET_PRODUCT := generic
-endif
+
 _entering_makefile_list_ := $(MAKEFILE_LIST)
-ifeq (,$(TARGET_PRODUCT))
-  $(error TARGET_PRODUCT/PROJECT is not set)
+
+ifeq (,$(TARGET_KERNEL_MEDIATEK_PRODUCT))
+  $(warning TARGET_KERNEL_MEDIATEK_PRODUCT is not set; ahong89_wet_jb2 is used by default)
+  TARGET_KERNEL_MEDIATEK_PRODUCT := ahong89_wet_jb2
 endif
 
-FULL_PROJECT := $(TARGET_PRODUCT)$(if $(FLAVOR),[$(FLAVOR)],)
+FULL_PROJECT := $(TARGET_KERNEL_MEDIATEK_PRODUCT)$(if $(FLAVOR),[$(FLAVOR)],)
 MTK_PROJECT  := $(word 1,$(subst [, ,$(FULL_PROJECT)))
 export FULL_PROJECT MTK_PROJECT
 
