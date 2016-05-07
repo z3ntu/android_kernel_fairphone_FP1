@@ -76,19 +76,6 @@ ifeq ($(TARGET_BUILD_VARIANT),user)
  KBUILD_CFLAGS += -DUSER_BUILD_KERNEL
 endif
 
-ifeq (,$(M))
-clean: mtkclean
-mtkclean:
-	@echo "clean mediatek kernel source tree"
-	@find $(MTK_PATH_PLATFORM) $(MTK_PATH_SOURCE) $(MTK_PATH_CUSTOM) $(RCS_FIND_IGNORE) \
-	\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
-	-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
-	-o -name '*.symtypes' -o -name 'modules.order' \
-	-o -name 'Module.markers' -o -name '.tmp_*.o.*' \
-	-o -name '*.gcno' \) -type f -print | grep -v "/prebuilt/" | xargs rm -f
-	find $(MTK_ROOT_GEN_CONFIG) -name kconfig -type f -print | xargs rm -f
-endif
-
 $(MTK_ROOT_GEN_CONFIG):
 	@mkdir -p $@
 
@@ -96,3 +83,5 @@ generated_files := $(call .mtk.config.generate-auto-rules,kconfig)
 mediatekconfig: $(MTK_ROOT_GEN_CONFIG)/kconfig
 	@echo "[COPY] $< --> $(KCONFIG_CONFIG)"
 	@cp $< $(KCONFIG_CONFIG)
+
+MRPROPER_FILES += $(generated_files)
