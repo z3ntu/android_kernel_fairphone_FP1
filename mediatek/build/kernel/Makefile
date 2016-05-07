@@ -55,12 +55,6 @@ mtkclean:
 endif
 
 generated_files := $(call mtk.config.generate-rules)
-.config mediatek-configs: $(MTK_ROOT_GEN_CONFIG)/kconfig $(MTK_ROOT_GEN_CONFIG)
-	@echo "[COPY] $< --> $@"
-	@cp $< $@
-	@echo "[COPY] $< --> .config"
-	@cp $< .config
-ifeq (mediatek-configs,$(MAKECMDGOALS))
-include/config/auto.conf: ;
-endif
-
+mediatekconfig: $(MTK_ROOT_GEN_CONFIG)/kconfig $(MTK_ROOT_GEN_CONFIG)
+	@echo "[COPY] $< --> $(KCONFIG_CONFIG)"
+	@cp $< $(KCONFIG_CONFIG)
