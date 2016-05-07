@@ -1,6 +1,6 @@
 include $(srctree)/../mediatek/build/Makefile
 ifneq ($(KBUILD_SRC),)
-$(call codebase-path,kernel,$(srctree)/..)
+$(call codebase-path,kernel,$(srctree)/..,$(call lc,$(MTK_PLATFORM)),$(FULL_PROJECT),$(objtree))
 else
 $(call codebase-path,kernel)
 endif
