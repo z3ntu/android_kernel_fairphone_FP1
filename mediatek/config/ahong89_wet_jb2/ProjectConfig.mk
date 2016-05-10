@@ -984,7 +984,7 @@ MTK_SEND_RR_SUPPORT=yes
 MTK_SENSOR_SUPPORT=yes
 
 # sdcard will be a folder of /data
-MTK_SHARED_SDCARD=yes
+MTK_SHARED_SDCARD=no
 
 # A mechanism for customer to enable their own sign key.
 MTK_SIGNATURE_CUSTOMIZATION=no
