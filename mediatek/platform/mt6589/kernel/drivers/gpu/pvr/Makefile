@@ -1,5 +1,4 @@
 OPTIM = -Os
-VER:=eng
 
 ccflags-y := \
 	-I$(MTK_PATH_PLATFORM)/drivers/gpu/pvr/include4 \
@@ -32,18 +31,10 @@ ccflags-y += \
 ccflags-y += \
 	-D__linux__ $(OPTIM) -g
 
-ifneq ($(strip $(TARGET_BUILD_VARIANT)),)
-ifneq ($(strip $(TARGET_BUILD_VARIANT)),eng)
-ifneq ($(strip $(MTK_3D_DEBUG_FOR_USER_VERSION)),yes)
-VER:=user
-endif
-endif
-endif
-
 ccflags-$(CONFIG_PVR_BUILD_RELEASE_MT6589) += \
-	-include $(MTK_PATH_PLATFORM)/drivers/gpu/pvr/include4/config_kernel_$(VER).h
+	-include $(MTK_PATH_PLATFORM)/drivers/gpu/pvr/include4/config_kernel_user.h
 ccflags-$(CONFIG_PVR_BUILD_DEBUG_MT6589) += \
-	-include $(MTK_PATH_PLATFORM)/drivers/gpu/pvr/include4/config_kernel_$(VER).h
+	-include $(MTK_PATH_PLATFORM)/drivers/gpu/pvr/include4/config_kernel_eng.h
 
 ifeq ($(MTK_FORCE_GPU_89T), yes)
 ccflags-y += -DMTK_FORCE_T
