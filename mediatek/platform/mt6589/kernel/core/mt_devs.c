@@ -1341,6 +1341,28 @@ void mt_fixup(struct tag *tags, char **cmdline, struct meminfo *mi)
                /* ATAG_NONE actual size */
                (uint32_t)(none_tag) - (uint32_t)(tag_next(cmdline_tag)) + 8);
     }
+
+    // Add command line parameters expected by Android's init to be set by the
+    // bootloader.
+
+    // When a powered off device is plugged in it is automatically booted. The
+    // boot mode in those cases is usually KERNEL_POWER_OFF_CHARGING_BOOT,
+    // except when the battery is very low (<5%), in which case the boot mode is
+    // LOW_POWER_OFF_CHARGING_BOOT instead.
+    if ((g_boot_mode == KERNEL_POWER_OFF_CHARGING_BOOT || g_boot_mode == LOW_POWER_OFF_CHARGING_BOOT) &&
+            (strlen(*cmdline) + strlen(" androidboot.mode=charger") + 1 < COMMAND_LINE_SIZE)) {
+        strcat(*cmdline, " androidboot.mode=charger");
+    }
+
+    // The serial number of the device is expected to be provided in the
+    // "androidboot.serialno" parameter, but unfortunately the serial number is
+    // not yet set at this moment, and the initialization of "serial_number" can
+    // not be moved from "mt6589_board_init()" to here, as "get_chip_code()" can
+    // not be called yet at this boot stage. This problem only applies to the
+    // serial number set when CONFIG_MTK_USB_UNIQUE_SERIAL is defined, but for
+    // consistency the default serial number set when
+    // CONFIG_MTK_USB_UNIQUE_SERIAL is not defined is not provided in the
+    // "androidboot.serial" parameter either.
 #endif
 }
 
