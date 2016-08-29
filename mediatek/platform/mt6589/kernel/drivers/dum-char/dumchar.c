@@ -1457,22 +1457,18 @@ loff_t dumchar_llseek (struct file *filp, loff_t off, int whence)
 		return -EINVAL;
 	}
 
-	if ( fo->act_filp->f_op->llseek ) {
-			newpos =  fo->act_filp->f_op->llseek( fo->act_filp, off,whence);
-	} else {
-			switch(whence) {
-			case SEEK_SET: 
-				newpos = off;
-				break;
-			case SEEK_CUR: 
-				newpos = fo->act_filp->f_pos + off;
-				break;
-			case SEEK_END: 
-				newpos = dev->size + off;
-				break;
-			default: 
-				return -EINVAL;
-			}
+	switch(whence) {
+		case SEEK_SET:
+			newpos = off;
+			break;
+		case SEEK_CUR:
+			newpos = fo->act_filp->f_pos + off;
+			break;
+		case SEEK_END:
+			newpos = dev->size + off;
+			break;
+		default:
+			return -EINVAL;
 	}
 			
 	if (newpos >= 0 && newpos <= dev->size){
