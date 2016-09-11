@@ -7,6 +7,14 @@
 
 #define PHYS_OFFSET 0x80000000
 
+#if defined(CONFIG_KEXEC_HARDBOOT)
+#if defined(CONFIG_ARCH_MT6589)
+#define KEXEC_HB_PAGE_ADDR		UL(0x9DD00000)
+#else
+#error "Adress for kexec hardboot page not defined"
+#endif
+#endif
+
 /*
  * Define macros.
  */

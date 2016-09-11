@@ -16,11 +16,32 @@ extern struct sys_timer mt6589_timer;
 extern void mt_fixup(struct tag *tags, char **cmdline, struct meminfo *mi);
 extern void mt_power_off(void);
 
+#ifdef CONFIG_KEXEC_HARDBOOT
+extern void __init mt_reserve(void);
+extern void (*kexec_hardboot_hook)(void);
+extern void mtk_wdt_set_timer(unsigned int value);
+#endif
+
+#ifdef CONFIG_KEXEC_HARDBOOT
+// As, despite my best efforts, I could not get the device to reboot from
+// "relocate_kernel.S" I opted for a somewhat hacky but working solution: in
+// "kexec_hardboot_hook" a restart is scheduled after 3 seconds, and in
+// "relocate_kernel.S" there is just an infinite loop waiting for the restart to
+// happen.
+void mt_kexec_hardboot_hook(void)
+{
+    mtk_wdt_set_timer(3);
+}
+#endif
 
 void __init mt_init(void)
 {
     pm_power_off = mt_power_off;
     panic_on_oops = 1;
+
+#ifdef CONFIG_KEXEC_HARDBOOT
+    kexec_hardboot_hook = mt_kexec_hardboot_hook;
+#endif
 }
 
 static struct map_desc mt_io_desc[] __initdata = 
@@ -130,5 +151,8 @@ MACHINE_START(MT6589, "MT6589")
     .timer          = &mt6589_timer,
     .init_machine   = mt_init,
     .fixup          = mt_fixup,
+#ifdef CONFIG_KEXEC_HARDBOOT
+    .reserve        = mt_reserve,
+#endif
     .restart        = arm_machine_restart
 MACHINE_END

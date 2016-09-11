@@ -25,6 +25,9 @@
 #include "mach/mtk_ccci_helper.h"
 #include <mach/mtk_memcfg.h>
 
+#ifdef CONFIG_KEXEC_HARDBOOT
+#include <linux/memblock.h>
+#endif
 
 #define SERIALNO_LEN 32
 static char serial_number[SERIALNO_LEN];
@@ -1199,15 +1202,27 @@ void mt_fixup(struct tag *tags, char **cmdline, struct meminfo *mi)
 
     /* Reserve memory in the last bank */
     if (reserved_mem_bank_tag) {
+#ifdef CONFIG_KEXEC_HARDBOOT
+        unsigned int reserved_size = ((__u32)TOTAL_RESERVED_MEM_SIZE);
+#else
         reserved_mem_bank_tag->u.mem.size -= ((__u32)TOTAL_RESERVED_MEM_SIZE);
+#endif
 	if(g_boot_mode == FACTORY_BOOT) {
             /* we need to reserved the maximum FB_SIZE to get a fixed TEST_3D pa. */
             unsigned int rest_fb_size = RESERVED_MEM_SIZE_FOR_FB_MAX - FB_SIZE;
             RESERVED_MEM_SIZE_FOR_TEST_3D = 0x9a00000 + rest_fb_size;
+#ifdef CONFIG_KEXEC_HARDBOOT
+            reserved_size += RESERVED_MEM_SIZE_FOR_TEST_3D;
+#else
             reserved_mem_bank_tag->u.mem.size -= RESERVED_MEM_SIZE_FOR_TEST_3D;
+#endif
         }
         FB_SIZE_EXTERN = FB_SIZE;
+#ifdef CONFIG_KEXEC_HARDBOOT
+        pmem_start = reserved_mem_bank_tag->u.mem.start + reserved_mem_bank_tag->u.mem.size - reserved_size;
+#else
         pmem_start = reserved_mem_bank_tag->u.mem.start + reserved_mem_bank_tag->u.mem.size;
+#endif
     } else // we should always have reserved memory
     	BUG();
 
@@ -1227,6 +1242,8 @@ void mt_fixup(struct tag *tags, char **cmdline, struct meminfo *mi)
                 "[PHY layout]PMEM     :   0x%08lx - 0x%08lx  (0x%08x)\n",
                 PMEM_MM_START, (PMEM_MM_START + PMEM_MM_SIZE - 1), PMEM_MM_SIZE);
     }
+
+#ifndef CONFIG_KEXEC_HARDBOOT
     /*
      * fixup memory tags for dual modem model
      * assumptions:
@@ -1307,6 +1324,7 @@ void mt_fixup(struct tag *tags, char **cmdline, struct meminfo *mi)
         tags->hdr.tag = ATAG_NONE; // mark the end of the tag list
         tags->hdr.size = 0;
     }
+#endif
 
     if(tags->hdr.tag == ATAG_NONE)
 	none_tag = tags;
@@ -1365,6 +1383,133 @@ void mt_fixup(struct tag *tags, char **cmdline, struct meminfo *mi)
     // "androidboot.serial" parameter either.
 #endif
 }
+
+#ifdef CONFIG_KEXEC_HARDBOOT
+// When the Fairphone 1 kernel boots up it reserves memory for the framebuffer
+// and other elements at the end of the last memory bank by modifying the ATAGs:
+// the last ATAG_MEM tag is shrunk and other ATAG_MEM tags are added to
+// represent the holes between the reserved memory. Due to this, when using
+// kexec-hardboot the ATAG_MEM tags are left untouched and the memory is
+// reserved using "memblock_remove" instead. Otherwise the kexec'd kernel would
+// receive the modified ATAGs, so the memory reserved by the boot kernel would
+// not be available for the kexec'd kernel; moreover, if it tried to reserve
+// memory in the last hole between the reserved memory of the boot kernel it
+// would be too small, so the memory would not be reserved and all kind of
+// problems would ensue. 
+void __init mt_reserve(void) {
+    unsigned int nr_modem = 0;
+    unsigned int i = 0;
+    unsigned int max_avail_addr = 0;
+    unsigned int modem_start_addr = 0;
+    unsigned int hole_start_addr = 0;
+    unsigned int hole_size = 0;
+    unsigned int *modem_size_list = 0;
+
+    phys_addr_t hardboot_page_start = 0;
+
+    phys_addr_t first_bank_start = meminfo.bank[0].start;
+    phys_addr_t first_bank_size = meminfo.bank[0].size;
+
+    phys_addr_t last_bank_start = meminfo.bank[meminfo.nr_banks -1].start;
+    phys_addr_t last_bank_size = meminfo.bank[meminfo.nr_banks -1].size;
+
+    if (memblock_remove(FB_START, FB_SIZE) != 0) {
+        printk(KERN_ALERT "Failed to reserve framebuffer memory\n");
+    }
+
+    if (memblock_remove(PMEM_MM_START, PMEM_MM_SIZE) != 0) {
+        printk(KERN_ALERT "Failed to reserve pmem memory\n");
+    }
+
+    // The modem memory is reserved before the other memory, regardless of
+    // whether it was succesfully reserved or not.
+    last_bank_size -= FB_SIZE;
+    last_bank_size -= PMEM_MM_SIZE;
+
+    // This code is (mostly) a direct translation of the code in mt_fixup using
+    // "last_bank_start" instead of "reserved_mem_bank_tag->u.mem.start" and
+    // "last_bank_size" instead of "reserved_mem_bank_tag->u.mem.size", and
+    // using "memblock_remove" instead of modifying the ATAG_MEM and adding a
+    // new one for the hole.
+    nr_modem = get_nr_modem();
+    modem_size_list = get_modem_size_list();
+    for (i = 0; i < nr_modem; i++) {
+        /* sanity test */
+        if (modem_size_list[i]) {
+            printk(KERN_ALERT"reserve for modem [%d], size = 0x%08x\n", i,
+                    modem_size_list[i]);
+        } else {
+            printk(KERN_ALERT"[Error]skip empty modem [%d]\n", i);
+            continue;
+        }
+        printk(KERN_ALERT
+                "last_bank_start = 0x%08x, "
+                "last_bank_size = 0x%08x, "
+                "TOTAL_RESERVED_MEM_SIZE = 0x%08x\n",
+                last_bank_start,
+                last_bank_size,
+                TOTAL_RESERVED_MEM_SIZE);
+        /* find out start address for modem */
+        max_avail_addr = last_bank_start +
+                         last_bank_size;
+        modem_start_addr =
+            round_down((max_avail_addr -
+                    modem_size_list[i]), 0x2000000);
+        /* sanity test */
+        if (modem_size_list[i] > last_bank_size) {
+            printk(KERN_ALERT"[Error]skip modem [%d] reserve: "
+                    "size too large: 0x%08x, "
+                    "last_bank_size: 0x%08x\n", i,
+                    modem_size_list[i],
+                    last_bank_size);
+            continue;
+        }
+        if (modem_start_addr < last_bank_start) {
+            printk(KERN_ALERT"[Error]skip modem [%d] reserve: "
+                    "modem crosses memory bank boundary: 0x%08x, "
+                    "last_bank_start: 0x%08x\n", i,
+                    modem_start_addr,
+                    last_bank_start);
+            continue;
+        }
+        printk(KERN_ALERT"modem reserve sanity test pass\n");
+        modem_start_addr_list[i] = modem_start_addr;
+        hole_start_addr = modem_start_addr + modem_size_list[i];
+        hole_size = max_avail_addr - hole_start_addr;
+        printk(KERN_ALERT
+                "max_avail_addr = 0x%08x, "
+                "modem_start_addr_list[%d] = 0x%08x, "
+                "hole_start_addr = 0x%08x, hole_size = 0x%08x\n",
+                max_avail_addr, i, modem_start_addr,
+                hole_start_addr, hole_size);
+        MTK_MEMCFG_LOG_AND_PRINTK(KERN_ALERT
+                "[PHY layout]MD       :   0x%08x - 0x%08x  (0x%08x)\n",
+                modem_start_addr,
+                (modem_start_addr + modem_size_list[i] - 1),
+                modem_size_list[i]);
+        /* reserve memory */
+        memblock_remove(modem_start_addr, modem_size_list[i]);
+        /* shrink last_bank_size */
+        last_bank_size -=
+            (max_avail_addr - modem_start_addr);
+        printk(KERN_ALERT
+                "reserved_mem_bank: start = 0x%08x, size = 0x%08x\n",
+                last_bank_start,
+                last_bank_size);
+    }
+
+    // Reserve space for hardboot page at the end of the first memory bank to
+    // get always the same address for KEXEC_HB_PAGE_ADDR, as the size of the
+    // second memory bank depends on several configuration parameters and even
+    // the boot mode.
+    hardboot_page_start = first_bank_start + first_bank_size - SZ_1M;
+    if (memblock_remove(hardboot_page_start, SZ_1M) == 0) {
+        printk(KERN_INFO "Hardboot page reserved at 0x%X\n", hardboot_page_start);
+    } else {
+        printk(KERN_ALERT "Failed to reserve space for hardboot page at 0x%X!\n", hardboot_page_start);
+    }
+}
+#endif
 
 struct platform_device auxadc_device = {
     .name   = "mt-auxadc",
