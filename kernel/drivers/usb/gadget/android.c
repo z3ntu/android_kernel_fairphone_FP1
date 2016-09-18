@@ -199,6 +199,7 @@ static void android_work(struct work_struct *data)
 	char *showcdrom_event[2] = { "USB_STATE=SHOWCDROMCMD", NULL };
 
 	char **uevent_envp = NULL;
+	char **uevent_envp_extra_disconnect = NULL;
 	char **uevent_envp_cdrom = NULL;
 	unsigned long flags;
 	/* Add for HW/SW connect */
@@ -232,8 +233,12 @@ static void android_work(struct work_struct *data)
 			uevent_envp = dev->connected ? hwconnected : hwdisconnected;
 		#else
 		//if "SEND the USB_STATE with hw_connected flag"
-		if(!is_hwconnected)
-			uevent_envp = is_hwconnected ? hwconnected : hwdisconnected;
+		if(!is_hwconnected) {
+			// Send an extra "USB_STATE=DISCONNECTED" besides the
+			// "USB_STATE=HWDISCONNECTED".
+			uevent_envp_extra_disconnect = disconnected;
+			uevent_envp = hwdisconnected;
+		}
 		#endif
 		//Modified for ALPS00421097, USB State conflict with BatteryChargerType
 
@@ -255,6 +260,14 @@ static void android_work(struct work_struct *data)
 	}
 
 	spin_unlock_irqrestore(&cdev->lock, flags);
+
+	if (uevent_envp_extra_disconnect) {
+		kobject_uevent_env(&dev->dev->kobj, KOBJ_CHANGE, uevent_envp_extra_disconnect);
+		xlog_printk(ANDROID_LOG_INFO, USB_LOG, "%s: sent uevent %s\n", __func__, uevent_envp_extra_disconnect[0]);
+	} else {
+		xlog_printk(ANDROID_LOG_INFO, USB_LOG, "%s: did not send extra disconnect uevent (%d %d %p)\n", __func__,
+			 dev->connected, dev->sw_connected, cdev->config);
+	}
 
 	if (uevent_envp) {
 		kobject_uevent_env(&dev->dev->kobj, KOBJ_CHANGE, uevent_envp);
