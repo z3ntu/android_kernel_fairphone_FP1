@@ -368,7 +368,30 @@ mtk_cfg80211_set_default_key (
 
     /* not implemented */
 
-    return -EINVAL;
+    // wpa_supplicant expects set_default_key to succeed, for example when
+    // authenticating. The original MediaTek kernel does not provide an
+    // implementation for this function and consequently returns an error value
+    // when called. However, this causes the authentication to fail and
+    // therefore prevents the device from connecting to a net.
+    //
+    // The official Android kernel for MediaTek devices "solves" this in
+    // android-mediatek-sprout-3.10-lollipop-mr1 and later branches by just
+    // returning a successful value. Surprisingly, this is enough for
+    // connections to work, even if it does not have a proper implementation.
+    //
+    // I do not know, however, whether faking the implementation could cause any
+    // problem or not, but, as this is used in the official Android kernel for
+    // MediaTek devices, I assume that it is a safe (although ugly) approach...
+    //
+    // The proper way to solve this would be, obviously, to provide a real
+    // implementation for set_default_key. That would require, in the end, to
+    // send the "CMD_ID_DEFAULT_KEY_ID" command to the combo chip along with the
+    // needed parameters. Unfortunately, the data structure that defines the
+    // parameter expected by the combo chip for that command is not included in
+    // the source code of the kernel. Therefore, it is not possible to implement
+    // set_default_key, as the parameters expected by the combo chip are
+    // unknown.
+    return WLAN_STATUS_SUCCESS;
 }
 
 
