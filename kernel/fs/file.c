@@ -517,7 +517,7 @@ static void fd_delete(unsigned int hash)
 	radix_tree_delete(&over_fd_tree, hash);
 }
 
-inline void fd_show_open_files(pid_t pid, struct files_struct *files, struct fdtable *fdt)
+void fd_show_open_files(pid_t pid, struct files_struct *files, struct fdtable *fdt)
 {
     int i=0;
 	struct over_fd_entry *lentry;
