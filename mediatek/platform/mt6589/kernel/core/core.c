@@ -9,6 +9,7 @@
 #include <mach/irqs.h>
 #include <asm/page.h>
 #include <mach/mt_mci.h>
+#include <mach/memory.h>
 #include <linux/bug.h>
 
 extern void arm_machine_restart(char mode, const char *cmd);
