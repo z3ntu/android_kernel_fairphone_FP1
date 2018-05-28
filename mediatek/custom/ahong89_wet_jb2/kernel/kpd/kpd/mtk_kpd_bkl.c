@@ -15,7 +15,7 @@
  */
 
 #include <mach/mt_typedefs.h>
-#include <mtk_kpd.h>		/* custom file */
+#include "mtk_kpd.h"		/* custom file */
 
 #if KPD_DRV_CTRL_BACKLIGHT
 void kpd_enable_backlight(void)
