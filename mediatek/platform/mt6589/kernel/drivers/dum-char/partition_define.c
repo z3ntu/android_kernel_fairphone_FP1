@@ -16,12 +16,10 @@ struct excel_info PartInfo[PART_NUM]={
 			{"sec_ro",6291456,0x3380000, EMMC, 4,USER},
 			{"misc",524288,0x3980000, EMMC, 0,USER},
 			{"logo",3145728,0x3a00000, EMMC, 0,USER},
-			{"ebr2",524288,0x3d00000, EMMC, 0,USER},
-			{"expdb",10485760,0x3d80000, EMMC, 0,USER},
-			{"android",681574400,0x4780000, EMMC, 5,USER},
-			{"cache",132120576,0x2d180000, EMMC, 6,USER},
-			{"usrdata",1073741824,0x34f80000, EMMC, 7,USER},
-			{"fat",13945667584,0x74f80000, EMMC, 8,USER},
+			{"expdb",10485760,0x3d00000, EMMC, 0,USER},
+			{"android",681574400,0x4700000, EMMC, 5,USER},
+			{"cache",132120576,0x2d100000, EMMC, 6,USER},
+			{"usrdata",1073741824,0x34f00000, EMMC, 7,USER},
 			{"bmtpool",22020096,0xFFFF00a8, EMMC, 0,USER},
  };
 EXPORT_SYMBOL(PartInfo);
@@ -30,7 +28,6 @@ EXPORT_SYMBOL(PartInfo);
 struct MBR_EBR_struct MBR_EBR_px[MBR_COUNT]={
 	{"mbr", {1, 2, 3, 4, }},
 	{"ebr1", {5, 6, 7, }},
-	{"ebr2", {8, }},
 };
 
 EXPORT_SYMBOL(MBR_EBR_px);
