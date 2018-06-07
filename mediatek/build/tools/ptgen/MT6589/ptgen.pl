@@ -118,7 +118,7 @@ $TARGET_BUILD_VARIANT=$ENV{TARGET_BUILD_VARIANT};
 
 my $PART_TABLE_FILENAME   = "mediatek/build/tools/ptgen/$PLATFORM/partition_table_${PLATFORM}.xls"; # excel file name
 my $REGION_TABLE_FILENAME = "mediatek/build/tools/emigen/$PLATFORM/MemoryDeviceList_${PLATFORM}.xls";  #eMMC region information
-my $EMMC_COMPO	= "mediatek/config/$PROJECT/mbr_addr.pl" ;
+my $EMMC_COMPO	= "./mediatek/config/$PROJECT/mbr_addr.pl" ;
 
 my $CUSTOM_MEMORYDEVICE_H_NAME  = "mediatek/custom/$PROJECT/preloader/inc/custom_MemoryDevice.h";
 my $PARTITION_DEFINE_H_NAME     = "mediatek/custom/$PROJECT/common/partition_define.h"; # 
