@@ -235,16 +235,6 @@ config MTK_SPI
           This selects the MediaTek(R) SPI bus driver.
           If you want to use MediaTek(R) SPI interface, say Y or M here.  If unsure, say N.
 
-# CMMB
-config  MTK_CMMB
-        #tristate "MediaTek CMMB Driver"
-        depends on  MTK_SPI
-        default m
-        ---help---
-          This selects the MediaTek(R) CMMB driver.
-          If you want to use MediaTek(R) CMMB driver, say M here.
-          If unsure, say N.
-
 # Jpeg
 config MTK_JPEG # JPEG_MT6516 (no JPEG_MT6573, but 6573 is supported!)
         tristate "MediaTek JPEG driver"
