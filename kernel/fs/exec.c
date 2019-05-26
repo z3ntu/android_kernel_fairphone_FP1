@@ -1627,7 +1627,7 @@ int do_execve(const char *filename,
             printk("[exec retry] argv[0]:0x%x\n", argv_p0);
         }
         ret = do_execve_common(filename, argv, envp, regs);
-        printk(KERN_DEBUG"[exec] %s(%d)\n", filename, retry);
+        //printk(KERN_DEBUG"[exec] %s(%d)\n", filename, retry);
     }while( -999 == ret && retry-- > 0);
 	return ret;
 }
