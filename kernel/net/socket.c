@@ -1121,11 +1121,7 @@ static int sock_close(struct inode *inode, struct file *filp)
 		printk(KERN_DEBUG "sock_close: NULL inode\n");
 		return 0;
 	}
-
-	printk(KERN_INFO "socket_close[%lu] \n",inode->i_ino); 
-	
 	sock_release(SOCKET_I(inode));
-	
 	return 0;
 }
 
@@ -1313,7 +1309,7 @@ EXPORT_SYMBOL(__sock_create);
 
 int sock_create(int family, int type, int protocol, struct socket **res)
 {
-    return  __sock_create(current->nsproxy->net_ns, family, type, protocol, res, 0); 
+	return __sock_create(current->nsproxy->net_ns, family, type, protocol, res, 0);
 }
 EXPORT_SYMBOL(sock_create);
 
@@ -1329,7 +1325,6 @@ SYSCALL_DEFINE3(socket, int, family, int, type, int, protocol)
 	struct socket *sock;
 	int flags;
 
-  
 	/* Check the SOCK_* constants for consistency.  */
 	BUILD_BUG_ON(SOCK_CLOEXEC != O_CLOEXEC);
 	BUILD_BUG_ON((SOCK_MAX | SOCK_TYPE_MASK) != SOCK_TYPE_MASK);
@@ -1354,12 +1349,6 @@ SYSCALL_DEFINE3(socket, int, family, int, type, int, protocol)
 
 out:
 	/* It may be already another descriptor 8) Not kernel problem. */
-
-	if((retval >= 0)&& sock && SOCK_INODE(sock) )
-	   printk(KERN_INFO "socket_create[%lu]:fd=%d \n",SOCK_INODE(sock)->i_ino,retval);
-	 else
-	   printk(KERN_INFO "socket_create:fd=%d \n",retval); 
-	
 	return retval;
 
 out_release:
@@ -1379,7 +1368,6 @@ SYSCALL_DEFINE4(socketpair, int, family, int, type, int, protocol,
 	struct file *newfile1, *newfile2;
 	int flags;
 
-   
 	flags = type & ~SOCK_TYPE_MASK;
 	if (flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK))
 		return -EINVAL;
@@ -1431,17 +1419,10 @@ SYSCALL_DEFINE4(socketpair, int, family, int, type, int, protocol,
 	if (!err)
 		err = put_user(fd2, &usockvec[1]);
 	if (!err)
-	{
-       if(sock1 && SOCK_INODE(sock1) && sock2&& SOCK_INODE(sock2) )
-	     printk(KERN_INFO "socketpair:fd1[%lu]=%d, fd2[%lu]=%d \n", SOCK_INODE(sock1)->i_ino,fd1,SOCK_INODE(sock2)->i_ino,fd2);
-	  
-      return 0;
-	}
-		
+		return 0;
 
 	sys_close(fd2);
 	sys_close(fd1);
-	printk(KERN_INFO "socketpair fail1: %d \n", err);
 	return err;
 
 out_release_both:
@@ -1449,7 +1430,6 @@ out_release_both:
 out_release_1:
 	sock_release(sock1);
 out:
-    printk(KERN_INFO "socketpair fail2: %d \n", err);
 	return err;
 }
 
@@ -1466,7 +1446,6 @@ SYSCALL_DEFINE3(bind, int, fd, struct sockaddr __user *, umyaddr, int, addrlen)
 	struct socket *sock;
 	struct sockaddr_storage address;
 	int err, fput_needed;
-
 
 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
 	if (sock) {
@@ -1496,8 +1475,6 @@ SYSCALL_DEFINE2(listen, int, fd, int, backlog)
 	struct socket *sock;
 	int err, fput_needed;
 	int somaxconn;
-
-	
 
 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
 	if (sock) {
@@ -1529,12 +1506,11 @@ SYSCALL_DEFINE2(listen, int, fd, int, backlog)
 SYSCALL_DEFINE4(accept4, int, fd, struct sockaddr __user *, upeer_sockaddr,
 		int __user *, upeer_addrlen, int, flags)
 {
-	struct socket *sock=NULL, *newsock =NULL;
+	struct socket *sock, *newsock;
 	struct file *newfile;
 	int err, len, newfd, fput_needed;
 	struct sockaddr_storage address;
 
- 
 	if (flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK))
 		return -EINVAL;
 
@@ -1594,10 +1570,6 @@ SYSCALL_DEFINE4(accept4, int, fd, struct sockaddr __user *, upeer_sockaddr,
 out_put:
 	fput_light(sock->file, fput_needed);
 out:
-      if( (err>=0)&& newsock && SOCK_INODE(newsock) )
-	   printk(KERN_INFO "socket_accept[%lu]:fd=%d \n",SOCK_INODE(newsock)->i_ino,err);
-	  else
-	   printk(KERN_INFO "socket_accept:fd=%d \n",err);
 	return err;
 out_fd:
 	fput(newfile);
@@ -1630,7 +1602,6 @@ SYSCALL_DEFINE3(connect, int, fd, struct sockaddr __user *, uservaddr,
 	struct sockaddr_storage address;
 	int err, fput_needed;
 
-	
 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
 	if (!sock)
 		goto out;
@@ -1663,7 +1634,6 @@ SYSCALL_DEFINE3(getsockname, int, fd, struct sockaddr __user *, usockaddr,
 	struct sockaddr_storage address;
 	int len, err, fput_needed;
 
-   
 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
 	if (!sock)
 		goto out;
@@ -1695,7 +1665,6 @@ SYSCALL_DEFINE3(getpeername, int, fd, struct sockaddr __user *, usockaddr,
 	struct sockaddr_storage address;
 	int len, err, fput_needed;
 
-	
 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
 	if (sock != NULL) {
 		err = security_socket_getpeername(sock);
@@ -1734,8 +1703,6 @@ SYSCALL_DEFINE6(sendto, int, fd, void __user *, buff, size_t, len,
 
 	if (len > INT_MAX)
 		len = INT_MAX;
-
-	
 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
 	if (!sock)
 		goto out;
@@ -1798,7 +1765,7 @@ SYSCALL_DEFINE6(recvfrom, int, fd, void __user *, ubuf, size_t, size,
 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
 	if (!sock)
 		goto out;
-   
+
 	msg.msg_control = NULL;
 	msg.msg_controllen = 0;
 	msg.msg_iovlen = 1;
@@ -1877,7 +1844,6 @@ SYSCALL_DEFINE5(getsockopt, int, fd, int, level, int, optname,
 {
 	int err, fput_needed;
 	struct socket *sock;
-	
 
 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
 	if (sock != NULL) {
@@ -1907,7 +1873,7 @@ SYSCALL_DEFINE2(shutdown, int, fd, int, how)
 {
 	int err, fput_needed;
 	struct socket *sock;
-  
+
 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
 	if (sock != NULL) {
 		err = security_socket_shutdown(sock, how);
@@ -2055,7 +2021,7 @@ SYSCALL_DEFINE3(sendmsg, int, fd, struct msghdr __user *, msg, unsigned, flags)
 	struct socket *sock = sockfd_lookup_light(fd, &err, &fput_needed);
 
 	if (!sock)
-		goto out;	
+		goto out;
 
 	err = __sys_sendmsg(sock, msg, &msg_sys, flags, NULL);
 
